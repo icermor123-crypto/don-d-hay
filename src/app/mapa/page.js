@@ -22,9 +22,11 @@ export default function MapaPage() {
   const [negocioActivo, setNegocioActivo] = useState(null)
   const [cardVisible, setCardVisible] = useState(false)
   const [mapReady, setMapReady] = useState(false)
+  const [gpsStatus, setGpsStatus] = useState('idle') // idle | loading | found | denied
   const mapRef = useRef(null)
   const mapInstanceRef = useRef(null)
   const markersRef = useRef([])
+  const userMarkerRef = useRef(null)
 
   const negociosFiltrados = negocios.filter(n => {
     if (filtro === 'Restaurantes') return n.tipo === 'restaurante'
@@ -36,6 +38,7 @@ export default function MapaPage() {
   const scoreColor = (s) => s >= 8 ? '#2A6E3A' : s >= 6 ? '#C87A0F' : '#C84B0F'
   const scoreBg = (s) => s >= 8 ? '#E4F0E8' : s >= 6 ? '#FEF3E8' : '#FDEBD8'
 
+  // Inicializar mapa
   useEffect(() => {
     if (typeof window === 'undefined' || mapInstanceRef.current) return
 
@@ -76,6 +79,7 @@ export default function MapaPage() {
     }
   }, [])
 
+  // Agregar marcadores de negocios
   useEffect(() => {
     if (!mapReady || !mapInstanceRef.current) return
 
@@ -116,6 +120,59 @@ export default function MapaPage() {
     })
   }, [mapReady, filtro])
 
+  // Función GPS
+  const centrarEnMiUbicacion = () => {
+    if (!mapInstanceRef.current) return
+    setGpsStatus('loading')
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords
+        const userCoords = [latitude, longitude]
+
+        import('leaflet').then(L => {
+          // Eliminar marcador anterior si existe
+          if (userMarkerRef.current) {
+            userMarkerRef.current.remove()
+          }
+
+          // Marcador de ubicación del usuario
+          const userIcon = L.divIcon({
+            className: '',
+            html: `
+              <div style="position:relative;width:20px;height:20px;">
+                <div style="position:absolute;inset:0;border-radius:50%;background:#4A90D9;opacity:0.2;animation:pulse 2s infinite;transform:scale(2.5);"></div>
+                <div style="position:absolute;inset:3px;border-radius:50%;background:#4A90D9;border:2.5px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>
+              </div>
+              <style>
+                @keyframes pulse {
+                  0% { transform: scale(1); opacity: 0.3; }
+                  50% { transform: scale(2.5); opacity: 0.1; }
+                  100% { transform: scale(1); opacity: 0.3; }
+                }
+              </style>
+            `,
+            iconAnchor: [10, 10],
+            iconSize: [20, 20],
+          })
+
+          userMarkerRef.current = L.marker(userCoords, { icon: userIcon }).addTo(mapInstanceRef.current)
+          mapInstanceRef.current.flyTo(userCoords, 15, { animate: true, duration: 1.5 })
+          setGpsStatus('found')
+
+          // Volver a idle después de 3 segundos
+          setTimeout(() => setGpsStatus('idle'), 3000)
+        })
+      },
+      (err) => {
+        console.error('GPS error:', err)
+        setGpsStatus('denied')
+        setTimeout(() => setGpsStatus('idle'), 3000)
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    )
+  }
+
   return (
     <div className="flex-1 bg-cream flex flex-col overflow-hidden">
       <StatusBar />
@@ -153,6 +210,41 @@ export default function MapaPage() {
       <div className="flex-1 relative overflow-hidden">
         <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
 
+        {/* Botón GPS */}
+        <button
+          onClick={centrarEnMiUbicacion}
+          className="absolute bottom-4 right-4 z-[999] w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all duration-200"
+          style={{
+            background: gpsStatus === 'found' ? '#1C1C1A' : gpsStatus === 'denied' ? '#C84B0F' : '#FDFBF7',
+            border: '0.5px solid #E8E4DC'
+          }}>
+          {gpsStatus === 'loading' ? (
+            <div style={{ width: 18, height: 18, border: '2px solid #9C9A95', borderTopColor: '#1C1C1A', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          ) : gpsStatus === 'denied' ? (
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M9 1L9 17M1 9L17 9" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="3" fill={gpsStatus === 'found' ? '#D4C8A8' : '#4A90D9'}/>
+              <circle cx="10" cy="10" r="7" stroke={gpsStatus === 'found' ? '#D4C8A8' : '#4A90D9'} strokeWidth="1.5" fill="none"/>
+              <path d="M10 1v3M10 16v3M1 10h3M16 10h3" stroke={gpsStatus === 'found' ? '#D4C8A8' : '#4A90D9'} strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          )}
+        </button>
+
+        {/* Tooltip GPS denegado */}
+        {gpsStatus === 'denied' && (
+          <div className="absolute bottom-20 right-4 z-[999] bg-carbon text-cream text-[11px] px-3 py-2 rounded-xl font-light max-w-[180px] text-center">
+            Activa el GPS en tu navegador para usar esta función
+          </div>
+        )}
+
+        <style>{`
+          @keyframes spin { to { transform: rotate(360deg); } }
+        `}</style>
+
+        {/* Card popup negocio */}
         {negocioActivo && (
           <div className={`absolute bottom-0 left-0 right-0 bg-card rounded-t-3xl px-5 pb-5 z-[1000] border-t border-border shadow-[0_-4px_24px_rgba(0,0,0,0.1)] transition-transform duration-300 ${cardVisible ? 'translate-y-0' : 'translate-y-full'}`}>
             <div className="w-9 h-1 bg-beige-dark rounded-full mx-auto mt-3 mb-4" />
