@@ -28,7 +28,7 @@ export default function BottomNav() {
       </Link>
 
       <Link href="/agregar" className="flex flex-col items-center gap-1 px-3 py-1">
-        <div className="w-11 h-11 bg-carbon rounded-full flex items-center justify-center -mt-5 shadow-[0_4px_12px_rgba(28,28,26,0.3)]">
+        <div className="w-11 h-11 bg-carbon rounded-full flex items-center justify-center -mt-5 shadow-[0_4px_12px_rgba(28,28,26,0.3)] relative z-[2000]">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <path d="M9 3v12M3 9h12" stroke="#F7F5F0" strokeWidth="2" strokeLinecap="round"/>
           </svg>
