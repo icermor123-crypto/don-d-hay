@@ -1,7 +1,6 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import StatusBar from '@/components/StatusBar'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -18,52 +17,68 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex-1 bg-cream flex flex-col overflow-hidden">
-      <StatusBar />
+    <main className="flex-1 bg-carbon flex flex-col overflow-hidden relative">
 
-      <div className="px-5 pb-4 bg-cream flex-shrink-0 border-b border-border">
-        <Link href="/" className="w-9 h-9 rounded-full bg-beige flex items-center justify-center mb-3 inline-flex">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M9 2L5 7l4 5" stroke="#1C1C1A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </Link>
-        <h1 className="font-serif text-2xl font-bold text-carbon mb-1">Iniciar sesión</h1>
-        <p className="text-[12px] text-muted font-light">Bienvenido de vuelta a Don D. Hay</p>
+      {/* Background circles */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute w-[420px] h-[420px] rounded-full border border-[#252523] -top-36 -left-28" />
+        <div className="absolute w-[280px] h-[280px] rounded-full border border-[#222220] -top-20 -left-14" />
+        <div className="absolute w-[500px] h-[500px] rounded-full border border-[#222220] -bottom-44 -right-36" />
+        <div className="absolute w-[320px] h-[320px] rounded-full border border-[#252523] -bottom-24 -right-20" />
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-6 flex flex-col gap-4">
+      {/* Top — Logo */}
+      <div className="flex flex-col items-center pt-16 pb-8 z-10 px-8">
+        <div className="w-16 h-16 rounded-2xl bg-cream flex items-center justify-center mb-4 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+          <span className="font-serif text-2xl font-bold text-carbon tracking-tight leading-none">
+            D<span className="text-sm opacity-25">•</span>H
+          </span>
+        </div>
+        <h1 className="font-serif text-3xl font-bold text-cream mb-1">Don D. Hay</h1>
+        <p className="text-[9px] tracking-[3px] uppercase text-[#4A4845] font-light">La Habana · Cuba</p>
+      </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="field-label">Correo electrónico</label>
-          <input
-            className="field-input"
-            type="email"
-            placeholder="tu@email.com"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-          />
+      {/* Form card */}
+      <div className="flex-1 bg-cream rounded-t-3xl px-6 pt-8 pb-6 z-10 flex flex-col gap-5 overflow-y-auto scrollbar-hide">
+
+        <div>
+          <h2 className="font-serif text-xl font-bold text-carbon mb-1">Iniciar sesión</h2>
+          <p className="text-[12px] text-muted font-light">Bienvenido de vuelta</p>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="field-label">Contraseña</label>
-          <div className="relative">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="field-label">Correo electrónico</label>
             <input
-              className="field-input pr-12"
-              type={showPass ? 'text' : 'password'}
-              placeholder="Tu contraseña"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
+              className="field-input"
+              type="email"
+              placeholder="tu@email.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
             />
-            <button
-              onClick={() => setShowPass(!showPass)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] text-muted font-medium">
-              {showPass ? 'Ocultar' : 'Ver'}
-            </button>
           </div>
-        </div>
 
-        <div className="text-right">
-          <button className="text-[12px] text-muted font-light">¿Olvidaste tu contraseña?</button>
+          <div className="flex flex-col gap-1.5">
+            <label className="field-label">Contraseña</label>
+            <div className="relative">
+              <input
+                className="field-input pr-14"
+                type={showPass ? 'text' : 'password'}
+                placeholder="Tu contraseña"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+              />
+              <button
+                onClick={() => setShowPass(!showPass)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] text-muted font-medium">
+                {showPass ? 'Ocultar' : 'Ver'}
+              </button>
+            </div>
+          </div>
+
+          <div className="text-right -mt-1">
+            <button className="text-[12px] text-muted font-light">¿Olvidaste tu contraseña?</button>
+          </div>
         </div>
 
         <button
@@ -80,7 +95,7 @@ export default function LoginPage() {
         </div>
 
         <div className="flex gap-3">
-          <button className="flex-1 flex items-center justify-center gap-2 bg-card border border-border rounded-2xl py-3 text-[12px] font-medium text-carbon">
+          <button className="flex-1 flex items-center justify-center gap-2 bg-card border border-border rounded-2xl py-3.5 text-[12px] font-medium text-carbon">
             <svg width="16" height="16" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -89,7 +104,7 @@ export default function LoginPage() {
             </svg>
             Google
           </button>
-          <button className="flex-1 flex items-center justify-center gap-2 bg-card border border-border rounded-2xl py-3 text-[12px] font-medium text-carbon">
+          <button className="flex-1 flex items-center justify-center gap-2 bg-card border border-border rounded-2xl py-3.5 text-[12px] font-medium text-carbon">
             📱 Teléfono
           </button>
         </div>
@@ -100,6 +115,6 @@ export default function LoginPage() {
         </p>
 
       </div>
-    </div>
+    </main>
   )
 }
