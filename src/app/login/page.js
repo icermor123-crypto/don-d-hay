@@ -13,7 +13,7 @@ export default function LoginPage() {
     setLoading(true)
     setTimeout(() => {
       setLoading(false)
-      window.location.href = '/mapa'
+      window.location.href = '/bienvenida'
     }, 1500)
   }
 

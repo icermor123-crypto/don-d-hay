@@ -28,7 +28,7 @@ export default function RegistroPage() {
     setLoading(true)
     setTimeout(() => {
       setLoading(false)
-      window.location.href = '/mapa'
+      window.location.href = '/bienvenida'
     }, 1500)
   }
 
