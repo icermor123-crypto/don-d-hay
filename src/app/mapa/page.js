@@ -40,7 +40,11 @@ export default function MapaPage() {
 
   // Inicializar mapa
   useEffect(() => {
-    if (typeof window === 'undefined' || mapInstanceRef.current) return
+    if (typeof window === "undefined") return
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.remove()
+      mapInstanceRef.current = null
+    }
 
     import('leaflet').then(L => {
       delete L.Icon.Default.prototype._getIconUrl
